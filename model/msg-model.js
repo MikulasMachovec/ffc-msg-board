@@ -1,26 +1,40 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const repliesSchema = new Schema({
-    text: {type: String, required: true},
-    delete_password: {type: String, required: true},
-    created_on: {type: Date},
-    reported: {type: Boolean}
+const date =new Date()
+
+const ReplySchema = new Schema({
+    text              : { type: String },
+    delete_password   : { type: String },
+    created_on        : { type: Date, default: date },
+    bumped_on         : { type: Date, default: date },
+    reported          : { type: Boolean,  default: false }
 })
 
-const messageSchema = new Schema(
+const Reply = mongoose.model('Reply', ReplySchema)
+
+const ThreadSchema = new Schema(
     {
-        board             :   {type: String, required: true},
-        text              :   {type: String, required: true},
-        created_on        :   {type: Date},
-        bumped_on         :   {type: Date},
-        reported          :   {type: Boolean },
-        delete_password   :   {type: String, required: true},
-        replies           :   [repliesSchema],
+        board             :   { type: String },
+        text              :   { type: String },
+        created_on        :   { type: Date, default: date},
+        bumped_on         :   { type: Date, default: date},
+        reported          :   { type: Boolean, default: false },
+        delete_password   :   { type: String },
+        replies           :   { type: [ReplySchema] },
     },
     { versionKey: false }
 );
 
-const message_db = mongoose.model('Message', messageSchema);
+const Thread = mongoose.model('Thread', ThreadSchema)
 
-module.exports = message_db;
+const BoardSchema = new Schema({
+    name    : { type: String },
+    threads : { type: [ThreadSchema] }
+})
+
+const Board = mongoose.model('Board', BoardSchema)
+
+exports.Board = Board;
+exports.Thread = Thread;
+exports.Reply = Reply
