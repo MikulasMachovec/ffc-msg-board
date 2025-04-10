@@ -35,9 +35,9 @@ module.exports = function (app) {
             console.log('newBoardData', savedNewBoard)
             if(!savedNewBoard){
                console.log(err)
-               res.send('error while saving to database')
+               res.send('error','error with saving to database')
             } else{
-               res.json(newThread)
+               res.redirect('/b/' + board)
             }   
          } else {
             foundBoard.threads.push(newThread)
@@ -45,12 +45,13 @@ module.exports = function (app) {
                console.log('savedFoundBoard', savedFoundBoard)
                if(!savedFoundBoard){
                   console.log(err)
-                  res.send('error while saving to database')
+                  res.send('error','error with saving to database')
                } else{
-                  res.json(newThread)
+                  res.redirect('/b/' + board)
                }    
          }
-      })
+   })
+
    .get(async(req,res)=>{
       const board = req.params.board
       const foundBoard = await BoardModel.findOne({name: board})
@@ -86,7 +87,46 @@ module.exports = function (app) {
 
    })
 
+   .put(async (req,res) => {
+      const {report_id} = req.body
+      let board = req.params.board
+      
+      const Board = await BoardModel.findOne({name: board})
+      if(!Board){
+         res.send('error', 'board not found')
+      } else {
+         let date = new Date()
+         let reportedThred = Board.threads.id(report_id);
+         reportedThred.reported = true;
+         reportedThred.bumped_on = date;
+         await Board.save()
+         res.send('reported')
+      } 
+   })
 
-  app.route('/api/replies/:board');
+   .delete(async (req,res)=>{
+      const {thread_id, delete_password } = req.body
+      let board = req.params.board
+      const foundBoard = await BoardModel.findOne({name:board})
+      if(!foundBoard){
+         res.send('error', 'board not found')
+      } else {   
+      let threadForDel = foundBoard.threads.id(thread_id)
+      if(threadForDel.delete_password === delete_password){
+            foundBoard.threads.pull(threadForDel)
+            await foundBoard.save()
+            res.json('success')
+         } else {
+            res.send('incorrect password')
+         }
+      }
+   })
 
+
+  app
+   .route('/api/replies/:board')
+   .post(async(req,res)=>{})
+   .get(async(req,res)=>{})
+   .put(async(req,res)=>{})
+   .delete(async(req,res)=>{})
 };
