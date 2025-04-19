@@ -66,7 +66,7 @@ module.exports = function (app) {
          .map((thread)=>{
             const sortedReplies = thread.replies
                .sort((a,b)=> b.created_on - a.created_on)
-               .slice(0, 3)
+               .slice(-3)
                .reverse()
                .map(reply => ({
                   _id: reply._id,
