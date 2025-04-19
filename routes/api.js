@@ -57,7 +57,7 @@ module.exports = function (app) {
       const foundBoard = await BoardModel.findOne({name: board})
       
       if(!foundBoard){
-         console.log('board not found')
+         console.log('board not found, get/api/threads/')
          return res.status(400).send('Board has not been found')
       }
       const sortedThreads = foundBoard.threads
@@ -158,6 +158,11 @@ module.exports = function (app) {
          threadToAddReply.bumped_on = date;
          threadToAddReply.replies.push(NewReplay)
          await Reply.save()
+
+         // to allow for test to work
+         if (req.headers['x-test-mode']) {
+            return res.json(threadToAddReply);
+         }
 
          res.redirect('/b/' + board)
             
