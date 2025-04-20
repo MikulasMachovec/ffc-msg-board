@@ -137,7 +137,7 @@ suite('Functional Tests', function() {
             // Reporting a thread: PUT request to /api/threads/{board}
             test('PUT request for report thread',()=>{
                 chai.request(server)
-                .put(`/api/thread/${board}`)
+                .put(`/api/threads/${board}`)
                 .send({
                     thread_id: testThreadId
                 })
